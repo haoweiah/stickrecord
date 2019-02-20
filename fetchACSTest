@@ -1,0 +1,62 @@
+#!/bin/bash
+#if [ $# -ne 2 ]; then
+#  echo "Usage: $0 -t/--test <acs test name>"
+#  exit 1
+#fi
+#
+#if [ "$1" != "--test" ] && [ "$1" != "-t" ]; then
+#   echo "$1 should be -t or --test."
+#   exit 1
+#fi
+
+show_file=`egrep -ir 'def '$1'\(' --include=*.py | awk -F':' '{print $1}'`
+#show_class=`cat $show_file | grep 'class ' | awk -F':' '{print $1}' | sed 's/class //'`
+show_class=`cat $show_file | grep 'class ' | awk '{print $2}'`
+
+echo "Test file is:"
+echo -e "\e[33m$show_file\e[0m"
+echo "Class name is:"
+echo -e "\e[33m$show_class\e[0m"
+echo "Test name is:"
+echo -e "\e[33m$1\e[0m"
+
+#case=()
+#case=''
+for file in $show_file;do
+    defnum=`egrep -n 'def '$1'\(' $file | awk -F':' '{print $1}'`
+    classnums=`grep -n "class " $file | awk -F':' '{print $1}'`
+    echo -e "defnum $defnum"
+    echo -e "classnums $classnums "
+    array=($classnums)
+    arnum=${#array[@]}
+    #for class in $show_class;do
+    #    class=`echo -e "$class" | awk -F'(' '{print $1}'`
+    # for classnum in $classnums;do
+    for(( i=${#array[@]}-1; i>=0;i-- ));do  
+        clanum=${array[$i]}
+        if [[ $defnum -gt ${array[$i]} ]];then
+            #case=(${case[@]} $file:$class.$1) 
+            #class=`sed -n '$classnump' $file | awk '{print $2}' | awk -F'(' '{print $1}'`
+            class=`cat $file | sed -n "$clanum p" | awk '{print $2}'|awk -F'(' '{print $1}'`
+            graphics_path=`echo $file | awk -F '/' '{print $2}'`
+            echo $graphics_path
+            case=$file:$class.$1
+            break 
+        fi 
+     done 
+done
+echo -e "nosetests -s $case"
+#source ~/.graphics_path $PWD $graphics_path 
+export TEST_DATA_ROOT=$PWD/testplan/$graphics_path
+exec nosetests -s $case
+#PS3="Please choose your menu:"
+#
+#select item in ${case[@]};do
+#    case $i in
+#        *)
+#            
+#            echo -e "nosetests -s $item"
+#            #$(nosetests -s $item > /root/nose.log 2&>1)
+#            break;
+#    esac
+#done
