@@ -19,5 +19,10 @@ def downloading():
         view_bar(i, 100)
     print('\n 下载完成。。')
 
+defdownloading2():
+    print("开始下载。。。")
+    for i in range(101):
+        time.sleep(0.05)
+        print("\r{}".format(i), end="", flush=True)
 if __name__ == "__main__":
     downloading()
